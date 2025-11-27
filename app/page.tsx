@@ -38,20 +38,34 @@ function SarcasticRotator({ isValid, techName, requested, max }: { isValid: bool
   )
 }
 
-function SearchBar({ value, onChange, darkMode }: { value: string; onChange: (value: string) => void; darkMode: boolean }) {
+function SearchBar({ value, onChange, onClear, darkMode }: { value: string; onChange: (value: string) => void; onClear: () => void; darkMode: boolean }) {
   return (
-    <div className="relative">
-      <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder='Try "LangChain 10" or "React 5"...'
-        className={`w-full pl-10 pr-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${darkMode
-          ? 'bg-slate-800 border-slate-700 text-white placeholder-slate-400'
-          : 'bg-white border-slate-300 text-slate-900 placeholder-slate-500'
-          }`}
-      />
+    <div className="relative max-w-lg mx-auto w-full group">
+      <div className={`absolute -inset-0.5 bg-gradient-to-r ${darkMode ? 'from-cyan-500 to-blue-500' : 'from-orange-500 to-red-500'} rounded-2xl opacity-20 group-hover:opacity-40 blur transition duration-500`}></div>
+      <div className="relative">
+        <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder='Try "LangChain 10" or "React 5"...'
+          className={`w-full pl-12 pr-12 py-4 border rounded-xl shadow-lg focus:outline-none transition-all duration-300 ${darkMode
+            ? 'bg-slate-900/60 backdrop-blur-xl border-slate-700/50 text-white placeholder-slate-400 focus:bg-slate-900/80'
+            : 'bg-white/60 backdrop-blur-xl border-white/50 text-slate-900 placeholder-slate-500 focus:bg-white/80'
+            }`}
+        />
+        {value && (
+          <button
+            onClick={onClear}
+            className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-colors ${darkMode
+              ? 'hover:bg-slate-700 text-slate-400 hover:text-white'
+              : 'hover:bg-slate-200 text-slate-500 hover:text-slate-900'
+              }`}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -99,7 +113,15 @@ function TechCard({
             </div>
 
             {/* Release info with enhanced styling */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className={`px-3 py-1.5 rounded-lg border ${darkMode
+                ? 'bg-slate-900/50 border-slate-600/50'
+                : 'bg-slate-50 border-slate-200'
+                }`}>
+                <span className={`text-sm font-semibold ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  {technology.category}
+                </span>
+              </div>
               <div className={`px-3 py-1.5 rounded-lg border ${darkMode
                 ? 'bg-slate-900/50 border-slate-600/50'
                 : 'bg-slate-50 border-slate-200'
@@ -241,6 +263,8 @@ export default function HomePage() {
   const [showBookmarks, setShowBookmarks] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+
   // NOTE: In a real app, move Dark Mode to a Context Provider (like next-themes)
   // so it persists between this page and the Wall of Shame page.
   // const [darkMode, setDarkMode] = useState(false)
@@ -270,19 +294,57 @@ export default function HomePage() {
     fetchData()
   }, [])
 
+  const categories = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(technologies.map(t => t.category)))
+    return ["All", ...uniqueCategories.sort()]
+  }, [technologies])
+
   const filteredTechnologies = useMemo(() => {
+    let filtered = technologies
+
+    // 1. Filter by Category
+    if (selectedCategory && selectedCategory !== "All") {
+      filtered = filtered.filter(t => t.category === selectedCategory)
+    } else if (!selectedCategory) {
+      // If no category selected, show nothing (except if searching? The requirement says "Remove all... show categories... click category -> show respective")
+      // But if I want to support "All" category, I should probably default to showing nothing or showing all if "All" is selected.
+      // Let's assume initial state is null -> show nothing.
+      // If "All" is selected -> show all.
+      // But wait, if I search, I should probably show results regardless of category?
+      // Let's make search override category selection if search is present.
+    }
+
     if (!searchQuery.trim()) {
       setValidationResult(null)
-      return technologies
+      // If no search and no category selected (or "All" not selected explicitly), show nothing?
+      // The prompt says: "Remove all the technologies from the main page and show the categories and when the User click on the category it will show up the respective technologies"
+      // So if selectedCategory is null, return empty array.
+      if (!selectedCategory) return []
+      return filtered
     }
 
     const query = searchQuery.toLowerCase().trim()
+
+    // If searching, we search within the filtered list (if a category is selected) OR all if "All" is selected?
+    // Actually, usually search is global. Let's make search global for better UX, or scoped to category?
+    // "add an ALL category as well to show all the technologies"
+    // I will make search filter the *currently selected category* (which includes "All").
+    // If no category is selected, I'll auto-select "All" or just search globally.
+    // Let's stick to: Search filters the `filtered` list.
+    // If `selectedCategory` is null, I should probably NOT return empty if there is a search query?
+    // Let's say: if search query exists, ignore category selection (search global).
+    // Or better: If search query exists, we search globally.
+
+    if (searchQuery.trim()) {
+      filtered = technologies // Reset to all for global search
+    }
+
     const match = query.match(/^(.+?)\s+(\d+)$/)
 
     if (match) {
       const [, techName, yearsStr] = match
       const requestedYears = parseInt(yearsStr, 10)
-      const tech = technologies.find((t) =>
+      const tech = filtered.find((t) =>
         t.name.toLowerCase().includes(techName.trim()) ||
         t.aliases?.some(alias => alias.toLowerCase().includes(techName.trim()))
       )
@@ -291,6 +353,7 @@ export default function HomePage() {
         const currentYear = new Date().getFullYear()
         const maxPossibleYears = currentYear - tech.release_year
         const isValid = requestedYears <= maxPossibleYears
+        const isMatch = true // We found it
 
         setValidationResult({
           technology: tech,
@@ -303,11 +366,12 @@ export default function HomePage() {
     } else {
       setValidationResult(null)
     }
-    return technologies.filter((tech) =>
+
+    return filtered.filter((tech) =>
       tech.name.toLowerCase().includes(query) ||
       tech.aliases?.some(alias => alias.toLowerCase().includes(query))
     )
-  }, [technologies, searchQuery])
+  }, [technologies, searchQuery, selectedCategory])
 
   const toggleBookmark = (name: string) => {
     setBookmarks((prev) => {
@@ -351,7 +415,34 @@ export default function HomePage() {
             </p>
           </div>
 
-          <SearchBar value={searchQuery} onChange={setSearchQuery} darkMode={darkMode} />
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            onClear={() => setSearchQuery("")}
+            darkMode={darkMode}
+          />
+
+          {/* Category Filters */}
+          {!loading && (
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {categories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 ${selectedCategory === category
+                    ? darkMode
+                      ? 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)]'
+                      : 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)]'
+                    : darkMode
+                      ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
+                    }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
 
           {loading ? (
             <div className="text-center py-12">
@@ -411,15 +502,27 @@ export default function HomePage() {
               )}
 
               <div className="grid gap-4">
-                {filteredTechnologies.map((tech) => (
-                  <TechCard
-                    key={tech.name}
-                    technology={tech}
-                    isBookmarked={bookmarks.has(tech.name)}
-                    onToggleBookmark={toggleBookmark}
-                    darkMode={darkMode}
-                  />
-                ))}
+                {filteredTechnologies.length > 0 ? (
+                  filteredTechnologies.map((tech) => (
+                    <TechCard
+                      key={tech.name}
+                      technology={tech}
+                      isBookmarked={bookmarks.has(tech.name)}
+                      onToggleBookmark={toggleBookmark}
+                      darkMode={darkMode}
+                    />
+                  ))
+                ) : (
+                  !loading && (
+                    <div className="text-center py-12 opacity-50">
+                      <p className="text-lg">
+                        {selectedCategory
+                          ? "No technologies found in this category matching your search."
+                          : "Select a category to view technologies."}
+                      </p>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           )}

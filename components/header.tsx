@@ -34,7 +34,7 @@ export function Header({
 
   if (!mounted) {
     return (
-      <header className="border-b shadow-sm sticky top-0 z-30 border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+      <header className="sticky top-0 z-30">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-5xl">
           <div className="flex items-center gap-6">
             <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -47,10 +47,7 @@ export function Header({
   }
 
   return (
-    <header className={`border-b sticky top-0 z-30 ${isDark
-      ? 'border-slate-800 bg-slate-900'
-      : 'border-slate-200 bg-white'
-      } shadow-sm`}>
+    <header className="sticky top-0 z-30">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-5xl">
         <div className="flex items-center gap-8">
           <Link href="/" className="group relative">
@@ -125,8 +122,7 @@ export function Header({
       </div>
 
       {/* Mobile Nav */}
-      <div className={`md:hidden flex p-3 border-t justify-center gap-2 ${isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
-        }`}>
+      <div className="md:hidden flex p-3 justify-center gap-2">
         <Link
           href="/jd-parser"
           className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-300 ${pathname === '/jd-parser'
