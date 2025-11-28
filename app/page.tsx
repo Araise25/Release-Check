@@ -41,7 +41,7 @@ function SarcasticRotator({ isValid, techName, requested, max }: { isValid: bool
 function SearchBar({ value, onChange, onClear, darkMode }: { value: string; onChange: (value: string) => void; onClear: () => void; darkMode: boolean }) {
   return (
     <div className="relative max-w-lg mx-auto w-full group">
-      <div className={`absolute -inset-0.5 bg-gradient-to-r ${darkMode ? 'from-cyan-500 to-blue-500' : 'from-orange-500 to-red-500'} rounded-2xl opacity-20 group-hover:opacity-40 blur transition duration-500`}></div>
+      <div className={`absolute -inset-0.5 bg-gradient-to-r from-[#101820] to-[#F2AA4C] rounded-2xl opacity-20 group-hover:opacity-40 blur transition duration-500`}></div>
       <div className="relative">
         <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`} />
         <input
@@ -385,33 +385,27 @@ export default function HomePage() {
   const bookmarkedTechnologies = technologies.filter((tech) => bookmarks.has(tech.name))
 
   return (
-    <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gradient-to-br from-slate-900 to-slate-800' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
+    <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-[#101820]' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
       <Header
         onBookmarksClick={() => setShowBookmarks(true)}
       />
 
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
+      <main className="flex-1 container mx-auto px-4 pt-24 pb-12 max-w-5xl flex flex-col items-center justify-center">
         <div className="w-full space-y-8 animate-in fade-in duration-500">
           <div className="text-center space-y-3 mb-12">
             <h1 className={`text-6xl font-black tracking-tight ${darkMode
               ? 'text-white drop-shadow-[0_0_25px_rgba(34,211,238,0.5)]'
               : 'text-slate-900'
               } relative`}>
-              <span className="relative">
+              <span className="relative inline-block">
                 Release
-                <span className={`absolute -bottom-2 left-0 w-full h-1 ${darkMode ? 'bg-gradient-to-r from-lime-400 to-cyan-400' : 'bg-gradient-to-r from-orange-500 to-red-500'
-                  }`}></span>
+                <span className={`absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#101820] to-[#F2AA4C]`}></span>
               </span>
               {' '}
-              <span className={`${darkMode ? 'text-cyan-400' : 'text-orange-600'
-                } font-black`}>Check</span>
+              <span className={`text-[#F2AA4C] font-black`}>Check</span>
             </h1>
-            <p className={`text-lg font-semibold ${darkMode ? 'text-cyan-400' : 'text-orange-600'}`}>
+            <p className={`text-lg font-semibold text-[#F2AA4C]`}>
               Fact-check job descriptions with realistic experience requirements
-            </p>
-            <p className={`text-sm mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              💡 Try: <span className={`font-mono px-2 py-1 rounded border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>Python 5</span> or{" "}
-              <span className={`font-mono px-2 py-1 rounded border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>LangChain 10</span>
             </p>
           </div>
 
@@ -430,9 +424,7 @@ export default function HomePage() {
                   key={category}
                   onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
                   className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 ${selectedCategory === category
-                    ? darkMode
-                      ? 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(6,182,212,0.5)]'
-                      : 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)]'
+                    ? 'bg-[#F2AA4C] text-[#101820] shadow-[0_0_15px_rgba(242,170,76,0.5)]'
                     : darkMode
                       ? 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
@@ -501,7 +493,7 @@ export default function HomePage() {
                 </div>
               )}
 
-              <div className="grid gap-4">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 {filteredTechnologies.length > 0 ? (
                   filteredTechnologies.map((tech) => (
                     <TechCard
@@ -514,7 +506,7 @@ export default function HomePage() {
                   ))
                 ) : (
                   !loading && (
-                    <div className="text-center py-12 opacity-50">
+                    <div className="text-center opacity-50">
                       <p className="text-lg">
                         {selectedCategory
                           ? "No technologies found in this category matching your search."

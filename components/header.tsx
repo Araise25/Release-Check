@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { AlertTriangle, Search, Moon, Sun, Bookmark, Code } from "lucide-react"
+import { AlertTriangle, Search, Moon, Sun, Bookmark, Code, Home } from "lucide-react"
 import { useTheme } from "next-themes"
 
 export function Header({
@@ -35,10 +35,11 @@ export function Header({
   if (!mounted) {
     return (
       <header className="sticky top-0 z-30">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-5xl">
+        <div className="container mx-auto px-4 py-2 md:py-3 flex items-center justify-between max-w-5xl">
           <div className="flex items-center gap-6">
             <Link href="/" className="hover:opacity-80 transition-opacity">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Release Check</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white hidden md:block">Release Check</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white md:hidden">RC</h2>
             </Link>
           </div>
         </div>
@@ -48,27 +49,26 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-30">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-5xl">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="group relative">
+      <div className="container mx-auto px-4 py-2 md:py-4 flex items-center justify-between max-w-5xl">
+        {/* Logo - Hidden on mobile */}
+        <div className="flex items-center gap-4 md:gap-8">
+          <Link href="/" className="group relative hidden md:block">
             <h2 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} transition-all`}>
               <span className="relative">
                 Release
-                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isDark ? 'bg-gradient-to-r from-lime-400 to-cyan-400' : 'bg-gradient-to-r from-orange-500 to-red-500'
-                  }`}></span>
+                <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full bg-gradient-to-r from-[#101820] to-[#F2AA4C]`}></span>
               </span>
               {' '}
-              <span className={isDark ? 'text-cyan-400' : 'text-orange-600'}>Check</span>
+              <span className={`text-[#F2AA4C]`}>Check</span>
             </h2>
           </Link>
 
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-2">
             <Link
               href="/jd-parser"
               className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 ${pathname === '/jd-parser'
-                ? isDark
-                  ? 'bg-gradient-to-r from-lime-400 to-cyan-400 text-slate-900 shadow-lg shadow-cyan-500/30'
-                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30'
+                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white shadow-lg shadow-[#F2AA4C]/30'
                 : isDark
                   ? 'text-slate-300 hover:text-white hover:bg-slate-800/50'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
@@ -80,9 +80,7 @@ export function Header({
             <Link
               href="/wall-of-shame"
               className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 ${pathname === '/wall-of-shame'
-                ? isDark
-                  ? 'bg-gradient-to-r from-lime-400 to-cyan-400 text-slate-900 shadow-lg shadow-cyan-500/30'
-                  : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30'
+                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white shadow-lg shadow-[#F2AA4C]/30'
                 : isDark
                   ? 'text-slate-300 hover:text-white hover:bg-slate-800/50'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
@@ -92,12 +90,50 @@ export function Header({
               Wall of Shame
             </Link>
           </nav>
+
+          {/* Mobile Nav - Icons Only */}
+          <nav className="flex md:hidden items-center gap-1">
+            <Link
+              href="/"
+              className={`p-2 rounded-lg transition-all duration-300 ${pathname === '/'
+                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white'
+                : isDark
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
+                }`}
+            >
+              <Home className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/jd-parser"
+              className={`p-2 rounded-lg transition-all duration-300 ${pathname === '/jd-parser'
+                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white'
+                : isDark
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
+                }`}
+            >
+              <Code className="w-5 h-5" />
+            </Link>
+            <Link
+              href="/wall-of-shame"
+              className={`p-2 rounded-lg transition-all duration-300 ${pathname === '/wall-of-shame'
+                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white'
+                : isDark
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
+                }`}
+            >
+              <AlertTriangle className="w-5 h-5" />
+            </Link>
+          </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Right side icons */}
+        <div className="flex items-center gap-1 md:gap-2">
           <button
             onClick={toggleTheme}
-            className={`p-2.5 rounded-xl transition-all duration-300 ${isDark
+            className={`p-2 md:p-2.5 rounded-xl transition-all duration-300 ${isDark
               ? 'hover:bg-slate-800 text-slate-300 hover:text-yellow-400 hover:scale-110'
               : 'hover:bg-slate-100 text-slate-700 hover:text-indigo-600 hover:scale-110'
               }`}
@@ -105,50 +141,20 @@ export function Header({
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
 
-          {/* Only show bookmarks button on main page if needed, or pass prop */}
+          {/* Bookmarks button */}
           {onBookmarksClick && (
             <button
               onClick={onBookmarksClick}
-              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${isDark
-                ? 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 hover:text-amber-400 hover:scale-105'
-                : 'bg-slate-100/50 text-slate-700 hover:bg-slate-200 hover:text-amber-600 hover:scale-105'
+              className={`p-2 md:px-4 md:py-2.5 rounded-xl transition-all duration-300 flex items-center gap-2 ${isDark
+                ? 'text-slate-300 hover:bg-slate-800 hover:text-amber-400 hover:scale-105'
+                : 'text-slate-700 hover:bg-slate-100 hover:text-amber-600 hover:scale-105'
                 }`}
             >
-              <Bookmark className="w-4 h-4" />
-              <span className="hidden sm:inline">Bookmarks</span>
+              <Bookmark className="w-5 h-5 md:w-4 md:h-4" />
+              <span className="hidden md:inline text-sm font-bold">Bookmarks</span>
             </button>
           )}
         </div>
-      </div>
-
-      {/* Mobile Nav */}
-      <div className="md:hidden flex p-3 justify-center gap-2">
-        <Link
-          href="/jd-parser"
-          className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-300 ${pathname === '/jd-parser'
-            ? isDark
-              ? 'bg-gradient-to-r from-lime-400 to-cyan-400 text-slate-900 shadow-lg'
-              : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-            : isDark
-              ? 'text-slate-400 hover:text-white'
-              : 'text-slate-600 hover:text-slate-900'
-            }`}
-        >
-          JD Parser
-        </Link>
-        <Link
-          href="/wall-of-shame"
-          className={`px-4 py-2 text-sm font-bold rounded-lg transition-all duration-300 ${pathname === '/wall-of-shame'
-            ? isDark
-              ? 'bg-gradient-to-r from-lime-400 to-cyan-400 text-slate-900 shadow-lg'
-              : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
-            : isDark
-              ? 'text-slate-400 hover:text-white'
-              : 'text-slate-600 hover:text-slate-900'
-            }`}
-        >
-          Wall of Shame
-        </Link>
       </div>
     </header>
   )

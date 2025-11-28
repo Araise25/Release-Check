@@ -273,13 +273,13 @@ function JDParsingArea({
                     onKeyDown={handleKeyDown}
                     placeholder="Paste the Job Description here (e.g., 'We are looking for a React expert with 12 years of experience...')"
                     className={`w-full h-48 p-5 rounded-2xl border-2 shadow-lg focus:outline-none focus:ring-2 transition-all resize-none ${darkMode
-                        ? 'bg-slate-800/90 border-slate-700 text-white placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500'
-                        : 'bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 focus:ring-orange-500 focus:border-orange-500'
+                        ? 'bg-slate-800/90 border-slate-700 text-white placeholder-slate-500 focus:ring-[#F2AA4C] focus:border-[#F2AA4C]'
+                        : 'bg-white/90 border-slate-300 text-slate-900 placeholder-slate-400 focus:ring-[#F2AA4C] focus:border-[#F2AA4C]'
                         } backdrop-blur-sm`}
                 />
                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
                     {showHint && (
-                        <div className={`text-xs px-3 py-1.5 rounded-lg font-semibold animate-in fade-in slide-in-from-right-2 ${darkMode ? 'bg-slate-700 text-cyan-400' : 'bg-slate-200 text-orange-600'
+                        <div className={`text-xs px-3 py-1.5 rounded-lg font-semibold animate-in fade-in slide-in-from-right-2 ${darkMode ? 'bg-slate-700 text-[#F2AA4C]' : 'bg-slate-200 text-[#F2AA4C]'
                             }`}>
                             💡 Tip: Use {shortcutKey}+Enter
                         </div>
@@ -288,8 +288,8 @@ function JDParsingArea({
                         onClick={handleManualClick}
                         disabled={!text.trim()}
                         className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${darkMode
-                            ? 'bg-gradient-to-r from-lime-400 to-cyan-400 text-slate-900 hover:shadow-cyan-500/50 hover:scale-105'
-                            : 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-orange-500/50 hover:scale-105'
+                            ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white hover:shadow-[#F2AA4C]/50 hover:scale-105'
+                            : 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white hover:shadow-[#F2AA4C]/50 hover:scale-105'
                             }`}
                     >
                         <FileText className="w-4 h-4" />
@@ -468,8 +468,8 @@ function TabButton({
             onClick={onClick}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all duration-300 ${active
                 ? darkMode
-                    ? 'bg-gradient-to-r from-lime-400 to-cyan-400 text-slate-900 shadow-lg shadow-cyan-500/30'
-                    : 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30'
+                    ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-slate-900 shadow-lg shadow-[#F2AA4C]/30'
+                    : 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white shadow-lg shadow-[#F2AA4C]/30'
                 : darkMode
                     ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
                     : 'bg-white/50 text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'
@@ -600,7 +600,7 @@ export default function JDParserPage() {
     }
 
     return (
-        <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gradient-to-br from-slate-900 to-slate-800' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
+        <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-[#101820]' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
             <Header
                 onBookmarksClick={() => setShowBookmarks(true)}
             />
@@ -614,14 +614,12 @@ export default function JDParserPage() {
                             } relative`}>
                             <span className="relative">
                                 JD Bullsh*t
-                                <span className={`absolute -bottom-2 left-0 w-full h-1 ${darkMode ? 'bg-gradient-to-r from-lime-400 to-cyan-400' : 'bg-gradient-to-r from-orange-500 to-red-500'
-                                    }`}></span>
+                                <span className={`absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-[#101820] to-[#F2AA4C]`}></span>
                             </span>
                             {' '}
-                            <span className={`${darkMode ? 'text-cyan-400' : 'text-orange-600'
-                                } font-black`}>Detector</span>
+                            <span className={`text-[#F2AA4C] font-black`}>Detector</span>
                         </h1>
-                        <p className={`text-lg font-semibold ${darkMode ? 'text-cyan-400' : 'text-orange-600'}`}>
+                        <p className={`text-lg font-semibold text-[#F2AA4C]`}>
                             Paste a Job Description. We'll check if the experience requirements exist in physical reality.
                         </p>
                     </div>
@@ -666,7 +664,7 @@ export default function JDParserPage() {
                                                 <p>No specific years of experience requirements found for known technologies.</p>
                                             </div>
                                         ) : (
-                                            <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="grid gap-4 grid-cols-2">
                                                 {parsedResults.map((result, idx) => (
                                                     <ResultCard
                                                         key={`${result.technology.name}-${idx}`}
