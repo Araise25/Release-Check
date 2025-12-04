@@ -7,6 +7,8 @@ import { useTheme } from "next-themes"
 import { getInvalidDialogues, validDialogues } from "@/lib/dialogues"
 import { Technology } from "@/lib/types"
 import { fetchTechnologies } from "@/lib/data"
+import { BookmarksDialog } from "@/components/bookmarks-dialog"
+import { useBookmarks } from "@/hooks/use-bookmarks"
 
 
 
@@ -172,93 +174,14 @@ function TechCard({
   )
 }
 
-function BookmarksDialog({
-  open,
-  onOpenChange,
-  bookmarkedTechnologies,
-  onToggleBookmark,
-  darkMode,
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  bookmarkedTechnologies: Technology[]
-  onToggleBookmark: (name: string) => void
-  darkMode: boolean
-}) {
-  // Handle ESC key to close dialog
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        onOpenChange(false)
-      }
-    }
 
-    window.addEventListener('keydown', handleEscape)
-    return () => window.removeEventListener('keydown', handleEscape)
-  }, [open, onOpenChange])
-
-  if (!open) return null
-
-  return (
-    <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={() => onOpenChange(false)}
-    >
-      <div
-        className={`rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200 ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'
-          }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={`flex items-center justify-between p-6 border-b ${darkMode ? 'border-slate-700' : 'border-slate-200'
-          }`}>
-          <div>
-            <h2 className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-              Bookmarked Technologies
-            </h2>
-            <p className={`text-sm mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              {bookmarkedTechnologies.length} {bookmarkedTechnologies.length === 1 ? 'item' : 'items'} saved
-            </p>
-          </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className={`p-2.5 rounded-xl transition-all duration-300 ${darkMode ? 'hover:bg-slate-700 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'
-              }`}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="p-6 overflow-y-auto max-h-[calc(85vh-100px)]">
-          {bookmarkedTechnologies.length === 0 ? (
-            <div className="text-center py-16">
-              <Bookmark className={`w-16 h-16 mx-auto mb-4 ${darkMode ? 'text-slate-700' : 'text-slate-300'}`} />
-              <p className={`text-lg font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>No bookmarks yet</p>
-              <p className={`text-sm mt-2 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>Start bookmarking technologies to see them here</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {bookmarkedTechnologies.map((tech) => (
-                <TechCard
-                  key={tech.name}
-                  technology={tech}
-                  isBookmarked={true}
-                  onToggleBookmark={onToggleBookmark}
-                  darkMode={darkMode}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // --- Main Page ---
 
 export default function HomePage() {
   const [technologies, setTechnologies] = useState<Technology[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set())
+  const { bookmarks, toggleBookmark, clearBookmarks } = useBookmarks()
   const [loading, setLoading] = useState(true)
   const [showBookmarks, setShowBookmarks] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
@@ -373,14 +296,7 @@ export default function HomePage() {
     )
   }, [technologies, searchQuery, selectedCategory])
 
-  const toggleBookmark = (name: string) => {
-    setBookmarks((prev) => {
-      const newBookmarks = new Set(prev)
-      if (newBookmarks.has(name)) newBookmarks.delete(name)
-      else newBookmarks.add(name)
-      return newBookmarks
-    })
-  }
+
 
   const bookmarkedTechnologies = technologies.filter((tech) => bookmarks.has(tech.name))
 
@@ -388,25 +304,28 @@ export default function HomePage() {
     <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-[#101820]' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
       <Header
         onBookmarksClick={() => setShowBookmarks(true)}
+        bookmarkCount={bookmarks.size}
       />
 
       <main className="flex-1 container mx-auto px-4 pt-24 pb-12 max-w-5xl flex flex-col items-center justify-center">
         <div className="w-full space-y-8 animate-in fade-in duration-500">
-          <div className="text-center space-y-3 mb-12">
-            <h1 className={`text-6xl font-black tracking-tight ${darkMode
-              ? 'text-white drop-shadow-[0_0_25px_rgba(34,211,238,0.5)]'
-              : 'text-slate-900'
-              } relative`}>
-              <span className="relative inline-block">
-                Release
-                <span className={`absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#101820] to-[#F2AA4C]`}></span>
-              </span>
-              {' '}
-              <span className={`text-[#F2AA4C] font-black`}>Check</span>
-            </h1>
-            <p className={`text-lg font-semibold text-[#F2AA4C]`}>
-              Fact-check job descriptions with realistic experience requirements
-            </p>
+          <div className={`transition-all duration-500 ease-in-out overflow-hidden ${!selectedCategory && !searchQuery.trim() ? 'max-h-[500px] opacity-100 mb-12' : 'max-h-0 opacity-0 mb-0'}`}>
+            <div className="text-center space-y-3">
+              <h1 className={`text-6xl font-black tracking-tight ${darkMode
+                ? 'text-white drop-shadow-[0_0_25px_rgba(34,211,238,0.5)]'
+                : 'text-slate-900'
+                } relative`}>
+                <span className="relative inline-block">
+                  Release
+                  <span className={`absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#101820] to-[#F2AA4C]`}></span>
+                </span>
+                {' '}
+                <span className={`text-[#F2AA4C] font-black`}>Check</span>
+              </h1>
+              <p className={`text-lg font-semibold text-[#F2AA4C]`}>
+                Fact-check job descriptions with realistic experience requirements
+              </p>
+            </div>
           </div>
 
           <SearchBar
@@ -506,7 +425,7 @@ export default function HomePage() {
                   ))
                 ) : (
                   !loading && (
-                    <div className="text-center opacity-50">
+                    <div className="col-span-1 md:col-span-2 text-center opacity-50">
                       <p className="text-lg">
                         {selectedCategory
                           ? "No technologies found in this category matching your search."
@@ -526,6 +445,7 @@ export default function HomePage() {
         onOpenChange={setShowBookmarks}
         bookmarkedTechnologies={bookmarkedTechnologies}
         onToggleBookmark={toggleBookmark}
+        onClearBookmarks={clearBookmarks}
         darkMode={darkMode}
       />
     </div>

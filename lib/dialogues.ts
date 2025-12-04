@@ -28,7 +28,6 @@ export const validDialogues = [
     `"Someone used a calculator. Amazing."`,
     `"Recruiter can count. Plot twist of the year."`,
     `"Reasonable for once. Enjoy it."`,
-    "Wild — a JD that lives in reality.",
     "Huh. Accuracy? Didn’t expect that here.",
     "Nice. No time travel required this time.",
     "Surprising. This one actually makes sense.",
@@ -43,4 +42,20 @@ export const validDialogues = [
     `"Finally, a realistic requirement."`,
     `"Recruiter used a calculator! It's super effective."`,
     "Safe. No time travel required.",
+]
+
+export const celebrationDialogues = [
+    "Wild — a JD that lives in reality.",
+    "This JD is so realistic it's suspicious.",
+    "Did a human write this? It actually makes sense.",
+    "Approved by the Laws of Physics.",
+    "Finally, a JD that doesn't require a DeLorean.",
+    "Logic checks out. Am I dreaming?",
+    "Recruiter Gold Star: Basic Math Achieved.",
+    "No red flags? Is this a trap?",
+    "A unicorn JD: Realistic and grounded.",
+    "Wow, a requirement that exists in this timeline.",
+    "Refreshing. No impossible math here.",
+    "I'm shocked. It's actually valid.",
+    "Look at that, a JD written by a sane person."
 ]

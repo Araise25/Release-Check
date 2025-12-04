@@ -7,9 +7,11 @@ import { AlertTriangle, Search, Moon, Sun, Bookmark, Code, Home } from "lucide-r
 import { useTheme } from "next-themes"
 
 export function Header({
-  onBookmarksClick
+  onBookmarksClick,
+  bookmarkCount = 0
 }: {
   onBookmarksClick?: () => void;
+  bookmarkCount?: number;
 }) {
   const pathname = usePathname()
   const { theme, setTheme, systemTheme } = useTheme()
@@ -67,29 +69,29 @@ export function Header({
           <nav className="hidden md:flex items-center gap-2">
             <Link
               href="/jd-parser"
-              className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 ${pathname === '/jd-parser'
-                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white shadow-lg shadow-[#F2AA4C]/30'
-                : isDark
-                  ? 'text-slate-300 hover:text-white hover:bg-slate-800/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
+              className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 
+      ${pathname === '/jd-parser'
+                  ? 'bg-[#F2AA4C] text-black'
+                  : `hover:bg-[#F2AA4C] hover:text-black ${isDark ? 'text-slate-300' : 'text-slate-600'}`
                 }`}
             >
               <Code className="w-4 h-4" />
               JD Parser
             </Link>
+
             <Link
               href="/wall-of-shame"
-              className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 ${pathname === '/wall-of-shame'
-                ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white shadow-lg shadow-[#F2AA4C]/30'
-                : isDark
-                  ? 'text-slate-300 hover:text-white hover:bg-slate-800/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
+              className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 
+      ${pathname === '/wall-of-shame'
+                  ? 'bg-[#F2AA4C] text-black'
+                  : `hover:bg-[#F2AA4C] hover:text-black ${isDark ? 'text-slate-300' : 'text-slate-600'}`
                 }`}
             >
               <AlertTriangle className="w-4 h-4" />
               Wall of Shame
             </Link>
           </nav>
+
 
           {/* Mobile Nav - Icons Only */}
           <nav className="flex md:hidden items-center gap-1">
@@ -151,7 +153,17 @@ export function Header({
                 }`}
             >
               <Bookmark className="w-5 h-5 md:w-4 md:h-4" />
-              <span className="hidden md:inline text-sm font-bold">Bookmarks</span>
+              <span className="hidden md:inline text-sm font-bold flex items-center gap-1.5">
+                Bookmarks
+                {bookmarkCount > 0 && (
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${isDark
+                    ? 'bg-amber-400/20 text-amber-400'
+                    : 'bg-amber-600/20 text-amber-600'
+                    }`}>
+                    {bookmarkCount}
+                  </span>
+                )}
+              </span>
             </button>
           )}
         </div>

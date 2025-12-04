@@ -4,9 +4,12 @@ import { useState, useEffect, useMemo } from "react"
 import { Bookmark, X, Quote, FileText, ArrowRight, CheckCircle, AlertTriangle, Copy, Info } from "lucide-react"
 import { Header } from "@/components/header"
 import { useTheme } from "next-themes"
-import { getInvalidDialogues, validDialogues } from "@/lib/dialogues"
+import { getInvalidDialogues, validDialogues, celebrationDialogues } from "@/lib/dialogues"
 import { Technology } from "@/lib/types"
 import { fetchTechnologies } from "@/lib/data"
+import confetti from "canvas-confetti"
+import { BookmarksDialog } from "@/components/bookmarks-dialog"
+import { useBookmarks } from "@/hooks/use-bookmarks"
 
 // --- Types ---
 
@@ -288,8 +291,8 @@ function JDParsingArea({
                         onClick={handleManualClick}
                         disabled={!text.trim()}
                         className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${darkMode
-                            ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white hover:shadow-[#F2AA4C]/50 hover:scale-105'
-                            : 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white hover:shadow-[#F2AA4C]/50 hover:scale-105'
+                            ? 'bg-[#F2AA4C] text-black hover:bg-[#F2AA4C]/90 hover:scale-105'
+                            : 'bg-[#F2AA4C] text-black hover:bg-[#F2AA4C]/90 hover:scale-105'
                             }`}
                     >
                         <FileText className="w-4 h-4" />
@@ -304,12 +307,6 @@ function JDParsingArea({
 function ResultCard({ result, darkMode }: { result: ParsedRequirement; darkMode: boolean }) {
     return (
         <div className="group relative">
-            {/* Gradient border effect */}
-            <div className={`absolute -inset-[1px] rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-all duration-500 ${result.isValid
-                ? 'bg-gradient-to-r from-emerald-400 to-green-500'
-                : 'bg-gradient-to-r from-rose-400 to-red-500'
-                }`}></div>
-
             <div className={`relative rounded-xl p-5 transition-all duration-300 ${darkMode
                 ? 'bg-slate-800/90 backdrop-blur-xl border border-slate-700/50 hover:bg-slate-800'
                 : 'bg-white/90 backdrop-blur-xl border border-slate-200/50 hover:bg-white'
@@ -321,8 +318,8 @@ function ResultCard({ result, darkMode }: { result: ParsedRequirement; darkMode:
                                 {result.technology.name}
                             </h3>
                             <span className={`text-xs px-3 py-1 rounded-full font-bold shadow-lg ${result.isValid
-                                ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white'
-                                : 'bg-gradient-to-r from-rose-400 to-red-500 text-white'
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-rose-500 text-white'
                                 }`}>
                                 {result.isValid ? '✓ VALID' : '✗ IMPOSSIBLE'}
                             </span>
@@ -335,6 +332,14 @@ function ResultCard({ result, darkMode }: { result: ParsedRequirement; darkMode:
                                 }`}>
                                 <span className={`text-xs font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                                     Released: {result.technology.release_year}
+                                </span>
+                            </div>
+                            <div className={`px-3 py-1.5 rounded-lg border ${darkMode
+                                ? 'bg-slate-900/50 border-slate-600/50'
+                                : 'bg-slate-50 border-slate-200'
+                                }`}>
+                                <span className={`text-xs font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                                    Age: {new Date().getFullYear() - result.technology.release_year}y
                                 </span>
                             </div>
                             <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -468,8 +473,8 @@ function TabButton({
             onClick={onClick}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all duration-300 ${active
                 ? darkMode
-                    ? 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-slate-900 shadow-lg shadow-[#F2AA4C]/30'
-                    : 'bg-gradient-to-r from-[#101820] to-[#F2AA4C] text-white shadow-lg shadow-[#F2AA4C]/30'
+                    ? 'bg-[#F2AA4C] text-black shadow-lg shadow-[#F2AA4C]/30'
+                    : 'bg-[#F2AA4C] text-black shadow-lg shadow-[#F2AA4C]/30'
                 : darkMode
                     ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
                     : 'bg-white/50 text-slate-600 hover:bg-slate-100/50 hover:text-slate-900'
@@ -542,7 +547,7 @@ function TabNavigation({
 export default function JDParserPage() {
     const [technologies, setTechnologies] = useState<Technology[]>([])
     const [parsedResults, setParsedResults] = useState<ParsedRequirement[]>([])
-    const [bookmarks, setBookmarks] = useState<Set<string>>(new Set())
+    const { bookmarks, toggleBookmark, clearBookmarks } = useBookmarks()
     const [showBookmarks, setShowBookmarks] = useState(false)
     const { theme, systemTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
@@ -552,6 +557,7 @@ export default function JDParserPage() {
     const [originalJD, setOriginalJD] = useState('')
     const [scanMethod, setScanMethod] = useState<'keyboard' | 'click'>('click')
     const [activeTab, setActiveTab] = useState<TabType>('analysis')
+    const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null)
 
     useEffect(() => {
         setMounted(true)
@@ -574,6 +580,7 @@ export default function JDParserPage() {
     }, [])
 
     const handleParse = (text: string) => {
+        setCelebrationMessage(null) // Reset message on new scan
         const results = parseJobDescription(text, technologies)
         setParsedResults(results)
         setOriginalJD(text)
@@ -584,25 +591,35 @@ export default function JDParserPage() {
         setChangelog(changes)
 
         setHasScanned(true)
+
+        // Trigger confetti if all results are valid and we have at least one result
+        if (results.length > 0 && results.every(r => r.isValid)) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#101820', '#ed6f63', '#34D399'] // Theme colors + Emerald
+            })
+
+            // Show celebration message after 3 seconds
+            setTimeout(() => {
+                const randomMessage = celebrationDialogues[Math.floor(Math.random() * celebrationDialogues.length)]
+                setCelebrationMessage(randomMessage)
+            }, 3000)
+        }
     }
 
     const handleManualClick = () => {
         setScanMethod('click')
     }
 
-    const toggleBookmark = (name: string) => {
-        setBookmarks((prev) => {
-            const newBookmarks = new Set(prev)
-            if (newBookmarks.has(name)) newBookmarks.delete(name)
-            else newBookmarks.add(name)
-            return newBookmarks
-        })
-    }
+
 
     return (
         <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-[#101820]' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
             <Header
                 onBookmarksClick={() => setShowBookmarks(true)}
+                bookmarkCount={bookmarks.size}
             />
 
             <main className="flex-1 container mx-auto px-4 py-12 max-w-4xl">
@@ -644,6 +661,15 @@ export default function JDParserPage() {
                                     {parsedResults.length} requirements found
                                 </span>
                             </div>
+
+                            {/* Celebration Message */}
+                            {celebrationMessage && (
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 text-center py-4">
+                                    <p className={`text-2xl font-black italic bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent drop-shadow-sm`}>
+                                        {celebrationMessage}
+                                    </p>
+                                </div>
+                            )}
 
                             {/* Tab Navigation */}
                             <TabNavigation
@@ -721,8 +747,14 @@ export default function JDParserPage() {
                 </div>
             </main>
 
-            {/* Reusing existing Dialog Logic */}
-            {/* (BookmarksDialog component code is assumed to be same as previous provided snippet) */}
+            <BookmarksDialog
+                open={showBookmarks}
+                onOpenChange={setShowBookmarks}
+                bookmarkedTechnologies={technologies.filter((tech) => bookmarks.has(tech.name))}
+                onToggleBookmark={toggleBookmark}
+                onClearBookmarks={clearBookmarks}
+                darkMode={darkMode}
+            />
         </div>
     )
 }
