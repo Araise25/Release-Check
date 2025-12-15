@@ -38,7 +38,7 @@ export function Header({
 
   if (!mounted) {
     return (
-      <header className="sticky top-0 z-30">
+      <header className="sticky top-0 z-30 glass">
         <div className="container mx-auto px-4 py-2 md:py-3 flex items-center justify-between max-w-5xl">
           <div className="flex items-center gap-6">
             <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -52,7 +52,7 @@ export function Header({
   }
 
   return (
-    <header className="sticky top-0 z-30">
+    <header className="sticky top-0 z-30 glass">
       <div className="container mx-auto px-4 py-2 md:py-4 flex items-center justify-between max-w-5xl">
         {/* Logo - Hidden on mobile */}
         <div className="flex items-center gap-4 md:gap-8">
