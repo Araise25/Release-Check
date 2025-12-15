@@ -8,6 +8,7 @@ import { getInvalidDialogues, validDialogues } from "@/lib/dialogues"
 import { Technology } from "@/lib/types"
 import { fetchTechnologies } from "@/lib/data"
 import { BookmarksDialog } from "@/components/bookmarks-dialog"
+import { AddTechDialog } from "@/components/add-tech-dialog"
 import { useBookmarks } from "@/hooks/use-bookmarks"
 
 
@@ -184,6 +185,7 @@ export default function HomePage() {
   const { bookmarks, toggleBookmark, clearBookmarks } = useBookmarks()
   const [loading, setLoading] = useState(true)
   const [showBookmarks, setShowBookmarks] = useState(false)
+  const [showAddTech, setShowAddTech] = useState(false)
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -305,6 +307,7 @@ export default function HomePage() {
       <Header
         onBookmarksClick={() => setShowBookmarks(true)}
         bookmarkCount={bookmarks.size}
+        onAddTechClick={() => setShowAddTech(true)}
       />
 
       <main className="flex-1 container mx-auto px-4 pt-24 pb-12 max-w-5xl flex flex-col items-center justify-center">
@@ -447,6 +450,13 @@ export default function HomePage() {
         onToggleBookmark={toggleBookmark}
         onClearBookmarks={clearBookmarks}
         darkMode={darkMode}
+      />
+
+      <AddTechDialog
+        open={showAddTech}
+        onOpenChange={setShowAddTech}
+        darkMode={darkMode}
+        categories={categories}
       />
     </div>
   )

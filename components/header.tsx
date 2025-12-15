@@ -8,10 +8,12 @@ import { useTheme } from "next-themes"
 
 export function Header({
   onBookmarksClick,
-  bookmarkCount = 0
+  bookmarkCount = 0,
+  onAddTechClick
 }: {
   onBookmarksClick?: () => void;
   bookmarkCount?: number;
+  onAddTechClick?: () => void;
 }) {
   const pathname = usePathname()
   const { theme, setTheme, systemTheme } = useTheme()
@@ -54,7 +56,8 @@ export function Header({
       <div className="container mx-auto px-4 py-2 md:py-4 flex items-center justify-between max-w-5xl">
         {/* Logo - Hidden on mobile */}
         <div className="flex items-center gap-4 md:gap-8">
-          <Link href="/" className="group relative hidden md:block">
+          <Link href="/" className="group relative hidden md:flex items-center gap-3">
+            <img src="/icon-32x32.png" alt="Release Check Logo" className="w-8 h-8" />
             <h2 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} transition-all`}>
               <span className="relative">
                 Release
@@ -90,6 +93,17 @@ export function Header({
               <AlertTriangle className="w-4 h-4" />
               Wall of Shame
             </Link>
+
+            {onAddTechClick && (
+              <button
+                onClick={onAddTechClick}
+                className={`group relative px-4 py-2 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 
+                hover:bg-[#F2AA4C] hover:text-black ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
+              >
+                <span className="text-lg leading-none">+</span>
+                Add Data
+              </button>
+            )}
           </nav>
 
 
@@ -128,6 +142,17 @@ export function Header({
             >
               <AlertTriangle className="w-5 h-5" />
             </Link>
+            {onAddTechClick && (
+              <button
+                onClick={onAddTechClick}
+                className={`p-2 rounded-lg transition-all duration-300 ${isDark
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/50'
+                  }`}
+              >
+                <span className="text-xl font-bold leading-none">+</span>
+              </button>
+            )}
           </nav>
         </div>
 
