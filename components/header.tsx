@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { AlertTriangle, Search, Moon, Sun, Bookmark, Code, Home } from "lucide-react"
@@ -57,7 +58,7 @@ export function Header({
         {/* Logo - Hidden on mobile */}
         <div className="flex items-center gap-4 md:gap-8">
           <Link href="/" className="group relative hidden md:flex items-center gap-3">
-            <img src="/icon-32x32.png" alt="Release Check Logo" className="w-8 h-8" />
+            <Image src="/icon-32x32.png" alt="Release Check Logo" width={32} height={32} className="w-8 h-8" />
             <h2 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'} transition-all`}>
               <span className="relative">
                 Release
