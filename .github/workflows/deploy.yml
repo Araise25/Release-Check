@@ -33,7 +33,7 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          NEXT_PUBLIC_BASE_PATH: /arAIse_Web
+          NEXT_PUBLIC_BASE_PATH: /Release-Check
 
       - name: Disable Jekyll (for GitHub Pages)
         run: touch ./out/.nojekyll  
